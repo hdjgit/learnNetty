@@ -24,6 +24,7 @@ public class ServerSocketDemo {
             while (true) {
                 //accept客户端
                 Socket socket = ss.accept();
+                System.out.println("socket accept.");
                 new TimeServerThread(socket).start();
             }
         } finally {
@@ -51,11 +52,12 @@ public class ServerSocketDemo {
                     reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     writer = new PrintWriter(socket.getOutputStream());
 
-                    while (true) {
+                    while (!this.socket.isClosed()) {   //这里的 socket.isClosed() 貌似一直是false，哪怕对端关闭了。
                         String line = reader.readLine();
                         System.out.println("receive:" + line);
+                        System.out.println(this.socket.isClosed());
                         writer.println(line);
-                        if (StringUtils.equalsIgnoreCase(line, "q")) {
+                        if (StringUtils.equalsIgnoreCase(line, "q") || line == null) {
                             break;
                         }
                     }
